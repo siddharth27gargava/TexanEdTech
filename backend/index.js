@@ -23,7 +23,8 @@ const userSchema = new mongoose.Schema({
     fullName: { type: String, required: true },
     email: { type: String, required: true },
     formResponses: { type: String, required: true },
-    candidacyPosition: { type: String, default: '' }
+    candidacyPosition: { type: String, default: '' },
+    similarityScore: { type: Number, default: 0 },
 
 }, { collection: 'applications' }); // Specify the collection name as 'applications'
 
@@ -121,7 +122,8 @@ KIPP provides equal employment opportunities for all applicants and employees. A
 
 
             // Update the candidate's candidacyPosition with the similarity score
-            const roundedScore = Math.round(score * 100) / 100; // Round to the nearest 2nd decimal
+            const roundedScore = Math.round(score * 100) / 100;
+            candidate.similarityScore = roundedScore; // Round to the nearest 2nd decimal
             if (roundedScore >= 0.65) {
                 candidate.candidacyPosition = "Accepted";
                 await candidate.save();
