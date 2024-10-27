@@ -92,5 +92,5 @@ module.exports = {
     saveFormResponse,
     fetchAllResponses,
     fetchGoogleSheetData,
-    processCandidates
+    processCandidates,
 };
