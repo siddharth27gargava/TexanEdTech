@@ -7,7 +7,7 @@ const formRoutes = require('./routes/formRoutes');
 const app = express();
 
 // Connect to MongoDB
-connectDB();
+// connectDB();
 
 // Middleware
 app.use(express.json());
