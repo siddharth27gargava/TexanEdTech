@@ -29,62 +29,12 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-// // Sample candidate data
-// const candidates = [
-//     {
-//         fullName: "John Smith",
-//         email: "giv.joseph2002@gmail.com",
-//         formResponses: "What is your highest level of education completed? Bachelor’s Degree\nDo you hold a valid Texas Teacher Certificate? Yes\nHow many years of teaching experience do you have? 3 years\nDescribe your experience in developing lesson plans that meet state standards: In my last position, I developed a year-long curriculum for high school mathematics aligned with Texas state standards. I utilized backward design to ensure each lesson built towards mastery of key concepts.\nDescribe your experience and the strategies you used to support students in educationally underserved communities: I worked at a school in a low-income neighborhood where I implemented after-school tutoring programs to provide additional academic support and mentorship for students struggling with core subjects.\nPlease provide an example of how you have promoted diversity and inclusion in your classroom: I created a classroom library featuring diverse authors and perspectives, allowing students to see themselves represented in the literature we studied.\nWhy are you interested in this position? I am drawn to KIPP Texas Public Schools because of its commitment to equity and excellence in education. I believe my values align closely with the mission of providing quality education to underserved communities.\nWhat makes you a good fit for our team? My experience working with diverse student populations has equipped me with the skills needed to adapt my teaching methods effectively. I am also committed to collaborating with colleagues for continuous improvement.",
-//         candidacyPosition: "",
-
-//     },
-//     {
-//         fullName: "Maria Gonzalez",
-//         email: "maria.gonzalez@email.com",
-//         formResponses: "What is your highest level of education completed? Master’s Degree\nDo you hold a valid Texas Teacher Certificate? Yes\nHow many years of teaching experience do you have? 7 years\nDescribe your experience in developing lesson plans that meet state standards: During my teaching internship, I created lesson plans for English Language Arts that incorporated state standards while engaging students through project-based learning activities.\nDescribe your experience and the strategies you used to support students in educationally underserved communities: In my previous role, I focused on building relationships with families and organized community workshops to engage parents in their children's education, which significantly improved student attendance and performance.\nPlease provide an example of how you have promoted diversity and inclusion in your classroom: I implemented group projects where students from different backgrounds worked together, encouraging them to share their unique experiences and learn from each other.\nWhy are you interested in this position? I admire KIPP's approach to fostering student growth through a rigorous curriculum and community involvement. I want to be part of a team that is dedicated to making a real difference in students' lives.\nWhat makes you a good fit for our team? I bring a strong track record of helping students achieve academic success, particularly in challenging environments. My dedication aligns well with KIPP's mission.",
-//         candidacyPosition: "",
-
-//     },
-//     {
-//         fullName: "David Brown",
-//         email: "nara29504@gmail.com",
-//         formResponses: "What is your highest level of education completed? Associate's Degree\nDo you hold a valid Texas Teacher Certificate? Yes\nHow many years of teaching experience do you have? 5 years\nDescribe your experience in developing lesson plans that meet state standards: I have experience creating unit plans for science classes that align with state standards, focusing on hands-on experiments to make learning interactive and relevant.\nDescribe your experience and the strategies you used to support students in educationally underserved communities: I partnered with local organizations to provide resources such as school supplies and access to technology, ensuring all students had the tools they needed to succeed.\nPlease provide an example of how you have promoted diversity and inclusion in your classroom: I facilitated discussions on social justice topics, encouraging students to express their views while fostering an environment of respect and open dialogue.\nWhy are you interested in this position? KIPP's focus on preparing students for college and careers resonates with me, as I want my teaching to empower students with the skills they need for their future endeavors.\nWhat makes you a good fit for our team? I am deeply committed to KIPP's values of persistence and purpose. My proactive approach ensures that I go above and beyond for my students, supporting them academically and emotionally.",
-//         candidacyPosition: "",
-
-//     },
-// ];
-
-// // Function to insert data
-// const seedDatabase = async () => {
-//     try {
-//         await User.insertMany(candidates);
-//         console.log("Data inserted successfully!");
-//     } catch (error) {
-//         console.error("Error inserting data:", error);
-//     } finally {
-//         mongoose.connection.close(); // Close the connection once done
-//     }
-// };
-
-// seedDatabase();
-
-
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
 
-// Run GET request on server startup
-const fetchUsersOnStartup = async () => {
-    try {
-        const users = await User.find();
-        console.log('Users fetched on startup:', users);
-    } catch (error) {
-        console.error('Error fetching users on startup:', error);
-    }
-};
-fetchUsersOnStartup();
 
 // Funtion to get embeddings
 async function getEmbeddings(text) {
@@ -99,9 +49,7 @@ async function getEmbeddings(text) {
     }
 }
 
-// Route to compare job description with applicant data
-//app.post('/compare', async (req, res) => {
-
+// Function to calculate similarity
 async function calculateSimilarity() {
     const jobDescription = "2024-25 High School Teacher\
 Dallas, TX, USA\
@@ -159,13 +107,6 @@ KIPP provides equal employment opportunities for all applicants and employees. A
 
         // Retrieve all applicant data from MongoDB Atlas
         const candidate = await User.find();
-        //const candidateEmbedding = await getEmbeddings(candidate.appl_data);
-
-        //const score = calculateCosineSimilarity(jobEmbedding, candidateEmbedding);
-        //console.log(`Name: ${candidate.fullName}, Email: ${candidate.email}, Similarity Score: ${score}`);
-
-        //const score = cosineSimilarity(jobEmbedding[0], candidateEmbedding[0]);
-
 
         const similarityScores = await Promise.all(candidate.map(async (candidate) => {
             candidateData = candidate.formResponses;
@@ -175,16 +116,9 @@ KIPP provides equal employment opportunities for all applicants and employees. A
             const candidateEmbedding = await getEmbeddings(candidateData);
 
             // Calculate similarity score
-            //const score = cosineSimilarity(jobEmbedding[0], candidateEmbedding[0]); // Extract vectors if needed
             const score = calculateCosineSimilarity(jobEmbedding, candidateEmbedding);
             console.log(`Name: ${candidate.fullName}, Email: ${candidate.email}, Similarity Score: ${score}`);
 
-            console.log('Job Embedding Length:', jobEmbedding.length);
-            console.log('Candidate Embedding Length:', candidateEmbedding.length);
-            console.log('First Element Type (Job):', typeof jobEmbedding[0]);
-            console.log('First Element Type (Candidate):', typeof candidateEmbedding[0]);
-            console.log('First Element Type (Job):', jobEmbedding[0]);
-            console.log('First Element Type (Candidate):', candidateEmbedding[0]);
 
             // Update the candidate's candidacyPosition with the similarity score
             const roundedScore = Math.round(score * 100) / 100; // Round to the nearest 2nd decimal
@@ -216,32 +150,3 @@ KIPP provides equal employment opportunities for all applicants and employees. A
 
 calculateSimilarity()
 
-
-
-
-
-app.post('/applications', async (req, res) => { // Change endpoint to /applications
-    const { name, age, experience, skills, answers } = req.body;
-
-    // Create a new user
-    const user = new User({ name, age, experience, skills, answers });
-
-    try {
-        // Save the user to the database
-        const savedUser = await user.save();
-        res.status(201).json(savedUser); // Respond with the saved user
-    } catch (error) {
-        res.status(400).json({ message: 'Error adding user', error });
-    }
-});
-
-// Endpoint to fetch all users
-app.get('/applications', async (req, res) => { // Change endpoint to /applications
-    try {
-        const users = await User.find();
-        console.log(users);
-        res.status(200).json(users);
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching users', error });
-    }
-});
