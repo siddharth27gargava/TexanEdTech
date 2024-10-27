@@ -1,7 +1,7 @@
 const FormResponse = require('../models/formResponse');
 const { google } = require('googleapis');
 const transporter = require('../config/emailConfig');
-const { evaluateCandidate } = require('./aiModel');
+//const { evaluateCandidate } = require('./aiModel');
 const sendOfferEmail = require('../utils/sendOfferEmail');
 
 // Function to save form response manually through POST request
@@ -93,5 +93,4 @@ module.exports = {
     fetchAllResponses,
     fetchGoogleSheetData,
     processCandidates,
-    scheduleDataFetch
 };
